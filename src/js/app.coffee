@@ -8,22 +8,32 @@ _.defaults this,
   Around: (object, methodName, adviseMethod) ->
     YouAreDaBomb(object, methodName).around(adviseMethod)
 
-$ = jQuery
-
 class Server
   constructor: ->
 
   take_data: ->
-    $.get 'http://0.0.0.0:3000/name_list', (data) ->
-      $(".main").append(data)
+    console.log("dupa")
+    $.ajax(
+          type: "GET"
+          url: "http://0.0.0.0:3000/name_list.json"
+          success: (names) =>
+            console.log("success")
+            console.log(names)
+            @data_taken(names)
+          error: =>
+            console.log("fail")
+          )
+      
+
+  data_taken: (data) ->
 
 class UseCase
   constructor: ->
     @names = ["Anette", "Henry", "Tarja", "Mia", "Callin", "Pauli"]
 
-  start: ->
-    console.log("hello")
+  start: (@server)->
     @writeNames(@names)
+    @server.take_data()
 
   writeNames: (names) =>
 
@@ -41,19 +51,19 @@ class Gui
     $(".main").append(element)
 
 class Glue
-  constructor: (@useCase, @gui)->
+  constructor: (@useCase, @gui, @server)->
     After(@useCase, "writeNames", (names) => @gui.showNames(names))
+    After(@server, "data_taken", (data) => gui.showNames(data))
 
 class App
   constructor: ->
     console.log("hello")
-    server = new Server()
     usecase = new UseCase()
     gui = new Gui()
-    glue = new Glue(usecase, gui)
+    server = new Server()
+    glue = new Glue(usecase, gui, server)
 
-    usecase.start()
-    server.take_data()
+    usecase.start(server)
 
 
 app = new App() 

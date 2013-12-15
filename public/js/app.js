@@ -26,7 +26,7 @@
       console.log("dupa");
       return $.ajax({
         type: "GET",
-        url: "http://0.0.0.0:3000/name_list.json",
+        url: "http://sway-backend-app.shellyapp.com/name_list.json",
         success: function(names) {
           console.log("success");
           console.log(names);
